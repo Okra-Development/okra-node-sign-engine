@@ -1,3 +1,4 @@
+import { PDFDocument } from 'pdf-lib';
 import * as pdfLibPlaceholderModule from '@signpdf/placeholder-pdf-lib';
 import { SignPdf } from '@signpdf/signpdf';
 import { P12Signer } from '@signpdf/signer-p12';
@@ -7,8 +8,8 @@ function getPlaceholderFunction(mod) {
 
   const targets = [mod, mod?.default].filter(Boolean);
   const candidateNames = [
-    'pdfLibAddPlaceholder',
     'pdflibAddPlaceholder',
+    'pdfLibAddPlaceholder',
     'addPlaceholder',
     'placeholderPdfLib',
   ];
@@ -29,7 +30,7 @@ function getPlaceholderFunction(mod) {
   }
 
   throw new Error(
-    'No se encontró la función para generar el placeholder en @signpdf/placeholder-pdf-lib'
+    'The function to generate the placeholder was not found in @signpdf/placeholder-pdf-lib. Please ensure you have the correct version installed and that it exports the function properly.'
   );
 }
 
@@ -37,26 +38,31 @@ export async function signCryptographic(pdfBuffer, options = {}) {
   const {
     p12Buffer,
     passphrase,
-    reason = 'Firma Digital',
+    reason = 'Digital Signature',
     location = '',
     name = 'Okra Sign Engine',
     signatureLength = 16384,
   } = options;
 
-  const pdfLibAddPlaceholder = getPlaceholderFunction(pdfLibPlaceholderModule);
+  const pdflibAddPlaceholder = getPlaceholderFunction(pdfLibPlaceholderModule);
 
-  const pdfWithPlaceholder = pdfLibAddPlaceholder({
-    pdfBuffer: Buffer.isBuffer(pdfBuffer) ? pdfBuffer : Buffer.from(pdfBuffer),
+  const pdfDoc = await PDFDocument.load(pdfBuffer);
+
+  pdflibAddPlaceholder({
+    pdfDoc,
     reason,
     location,
     name,
     signatureLength,
   });
 
+  const pdfWithPlaceholderBytes = await pdfDoc.save({ useObjectStreams: false });
+  const pdfWithPlaceholderBuffer = Buffer.from(pdfWithPlaceholderBytes);
+
   const p12Signer = new P12Signer(p12Buffer, { passphrase });
 
   const signer = new SignPdf();
-  const signedPdfBuffer = await signer.sign(pdfWithPlaceholder, p12Signer);
+  const signedPdfBuffer = await signer.sign(pdfWithPlaceholderBuffer, p12Signer);
 
   return Buffer.from(signedPdfBuffer);
 }
