@@ -1,4 +1,4 @@
-import * as placeholderModule from '@signpdf/placeholder-plain';
+import * as pdfLibPlaceholderModule from '@signpdf/placeholder-pdf-lib';
 import { SignPdf } from '@signpdf/signpdf';
 import { P12Signer } from '@signpdf/signer-p12';
 
@@ -6,14 +6,11 @@ function getPlaceholderFunction(mod) {
   if (typeof mod === 'function') return mod;
 
   const targets = [mod, mod?.default].filter(Boolean);
-
   const candidateNames = [
-    'pdfPlainPlaceholder',
-    'placeholderPlain',
-    'plainPlaceholder',
-    'pdfPlaceholder',
+    'pdfLibAddPlaceholder',
+    'pdflibAddPlaceholder',
     'addPlaceholder',
-    'createPlaceholder',
+    'placeholderPdfLib',
   ];
 
   for (const target of targets) {
@@ -31,11 +28,8 @@ function getPlaceholderFunction(mod) {
     }
   }
 
-  const modKeys = Object.keys(mod || {});
-  const defaultKeys = mod?.default ? Object.keys(mod.default) : [];
   throw new Error(
-    `No se encontró la función para generar el placeholder en @signpdf/placeholder-plain. ` +
-      `Claves exportadas: [${modKeys.join(', ')}]. Claves en default: [${defaultKeys.join(', ')}].`
+    'No se encontró la función para generar el placeholder en @signpdf/placeholder-pdf-lib'
   );
 }
 
@@ -49,10 +43,10 @@ export async function signCryptographic(pdfBuffer, options = {}) {
     signatureLength = 16384,
   } = options;
 
-  const createPlaceholder = getPlaceholderFunction(placeholderModule);
+  const pdfLibAddPlaceholder = getPlaceholderFunction(pdfLibPlaceholderModule);
 
-  const pdfWithPlaceholder = createPlaceholder({
-    pdfBuffer,
+  const pdfWithPlaceholder = pdfLibAddPlaceholder({
+    pdfBuffer: Buffer.isBuffer(pdfBuffer) ? pdfBuffer : Buffer.from(pdfBuffer),
     reason,
     location,
     name,
