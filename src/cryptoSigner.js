@@ -4,7 +4,7 @@ import { P12Signer } from '@signpdf/signer-p12';
 
 export async function addPlaceholder(pdfBuffer, options = {}) {
   const {
-    reason = 'Digital Signature',
+    reason = 'Firma Digital',
     location = '',
     name = 'Okra Sign Engine',
     signatureLength = 16384,
@@ -76,6 +76,7 @@ export async function addPlaceholder(pdfBuffer, options = {}) {
   const savedBytes = await pdfDoc.save({ useObjectStreams: false });
   return Buffer.from(savedBytes);
 }
+
 export async function signCryptographic(pdfBuffer, options) {
   const { p12Buffer, passphrase, reason, location, signatureLength } = options;
 
@@ -85,10 +86,7 @@ export async function signCryptographic(pdfBuffer, options) {
     signatureLength,
   });
 
-  const p12Signer = new P12Signer({
-    p12Buffer,
-    passphrase,
-  });
+  const p12Signer = new P12Signer(p12Buffer, { passphrase });
 
   const signer = new SignPdf();
   const signedPdfBuffer = await signer.sign(pdfWithPlaceholder, p12Signer);
