@@ -1,6 +1,11 @@
-import { placeholderPlain } from '@signpdf/placeholder-plain';
+import * as placeholderModule from '@signpdf/placeholder-plain';
 import { SignPdf } from '@signpdf/signpdf';
 import { P12Signer } from '@signpdf/signer-p12';
+
+const createPlaceholder =
+  placeholderModule.pdfPlainPlaceholder ||
+  placeholderModule.placeholderPlain ||
+  placeholderModule.default;
 
 export async function signCryptographic(pdfBuffer, options = {}) {
   const {
@@ -12,7 +17,8 @@ export async function signCryptographic(pdfBuffer, options = {}) {
     signatureLength = 16384,
   } = options;
 
-  const pdfWithPlaceholder = placeholderPlain(pdfBuffer, {
+  const pdfWithPlaceholder = createPlaceholder({
+    pdfBuffer,
     reason,
     location,
     name,
