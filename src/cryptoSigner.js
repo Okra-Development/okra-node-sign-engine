@@ -1,10 +1,11 @@
 import { PDFDocument, PDFName, PDFString, PDFArray, PDFDict } from 'pdf-lib';
-import { SignPdf } from '@node-signpdf/signpdf';
-import { P12Signer } from '@node-signpdf/signer-p12';
+import signpdfModule from 'node-signpdf';
+
+const signer = signpdfModule.signer || signpdfModule.default?.signer || signpdfModule;
 
 export async function addPlaceholder(pdfBuffer, options = {}) {
   const {
-    reason = 'Firma Digital',
+    reason = 'Digital Sign',
     location = '',
     name = 'Okra Sign Engine',
     signatureLength = 16384,
@@ -77,13 +78,9 @@ export async function signCryptographic(pdfBuffer, options) {
     signatureLength,
   });
 
-  const p12Signer = new P12Signer({
-    p12Buffer,
+  const signedPdfBuffer = signer.sign(pdfWithPlaceholder, p12Buffer, {
     passphrase,
   });
-
-  const signer = new SignPdf();
-  const signedPdfBuffer = await signer.sign(pdfWithPlaceholder, p12Signer);
 
   return Buffer.from(signedPdfBuffer);
 }

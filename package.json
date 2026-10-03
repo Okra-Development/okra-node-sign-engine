@@ -1,6 +1,6 @@
 {
   "name": "@okra-development/okra-node-sign-engine",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Motor de firma digital PAdES, estampado visual y sello criptográfico para Node.js",
   "main": "src/index.js",
   "type": "module",
@@ -30,8 +30,7 @@
   "author": "Okra Development",
   "license": "MIT",
   "dependencies": {
-    "@node-signpdf/signer-p12": "^3.0.0",
-    "@node-signpdf/signpdf": "^3.0.0",
+    "node-signpdf": "^2.0.0",
     "pdf-lib": "^1.17.1"
   }
 }
