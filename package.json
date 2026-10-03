@@ -1,0 +1,38 @@
+{
+  "name": "@okra-development/okra-node-sign-engine",
+  "version": "0.1.0",
+  "description": "A Node.js engine for cryptographic PDF signing (PAdES), visual signature placement, RFC 3161 timestamps, and Long-Term Validation (LTV).",
+  "main": "src/index.js",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Okra-Development/okra-node-sign-engine.git"
+  },
+  "keywords": [
+    "pdf",
+    "signature",
+    "pades",
+    "pkcs7",
+    "odoo-sign",
+    "node-js"
+  ],
+  "author": "Okra Development",
+  "license": "MIT",
+  "dependencies": {
+    "@node-signpdf/placeholder-pdf-lib": "^3.0.0",
+    "@node-signpdf/signer-p12": "^3.0.0",
+    "@node-signpdf/signpdf": "^3.0.0",
+    "pdf-lib": "^1.17.1"
+  }
+}
