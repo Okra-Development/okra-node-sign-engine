@@ -40,34 +40,42 @@ export async function addPlaceholder(pdfBuffer, options = {}) {
 
   const pages = pdfDoc.getPages();
   const firstPage = pages[0];
-  let annots = firstPage.node.lookup(PDFName.of('Annots'), PDFArray);
-  if (!annots) {
+  const annotsRef = firstPage.node.get(PDFName.of('Annots'));
+  let annots;
+  if (annotsRef) {
+    annots = pdfDoc.context.lookup(annotsRef, PDFArray);
+  } else {
     annots = pdfDoc.context.obj([]);
     firstPage.node.set(PDFName.of('Annots'), annots);
   }
   annots.push(widgetRef);
 
-  let acroForm = pdfDoc.catalog.lookup(PDFName.of('AcroForm'), PDFDict);
-  if (!acroForm) {
+  const acroFormRef = pdfDoc.catalog.get(PDFName.of('AcroForm'));
+  let acroForm;
+  if (acroFormRef) {
+    acroForm = pdfDoc.context.lookup(acroFormRef, PDFDict);
+  } else {
     acroForm = pdfDoc.context.obj({
-      Fields: [widgetRef],
+      Fields: [],
       SigFlags: 3,
     });
     pdfDoc.catalog.set(PDFName.of('AcroForm'), acroForm);
-  } else {
-    let fields = acroForm.lookup(PDFName.of('Fields'), PDFArray);
-    if (!fields) {
-      fields = pdfDoc.context.obj([]);
-      acroForm.set(PDFName.of('Fields'), fields);
-    }
-    fields.push(widgetRef);
-    acroForm.set(PDFName.of('SigFlags'), pdfDoc.context.obj(3));
   }
+
+  const fieldsRef = acroForm.get(PDFName.of('Fields'));
+  let fields;
+  if (fieldsRef) {
+    fields = pdfDoc.context.lookup(fieldsRef, PDFArray);
+  } else {
+    fields = pdfDoc.context.obj([]);
+    acroForm.set(PDFName.of('Fields'), fields);
+  }
+  fields.push(widgetRef);
+  acroForm.set(PDFName.of('SigFlags'), pdfDoc.context.obj(3));
 
   const savedBytes = await pdfDoc.save({ useObjectStreams: false });
   return Buffer.from(savedBytes);
 }
-
 export async function signCryptographic(pdfBuffer, options) {
   const { p12Buffer, passphrase, reason, location, signatureLength } = options;
 
